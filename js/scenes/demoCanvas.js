@@ -100,7 +100,8 @@ export const init = async model => {
 
    // TRACKPAD AND TEXT BOX
 
-   let obj5 = model.add('cube').texture(() => {
+   let obj5 = model.add('cube')
+       .texture(() => {
       g2.setColor('white');
       g2.fillRect(0,0,1,1);
       g2.setColor('black');
@@ -111,7 +112,7 @@ export const init = async model => {
       g2.drawWidgets(obj5);
    });
    obj5.value = [.5,.5];
-   g2.addWidget(obj5, 'trackpad', .5, .6, '#ff8080', 'my widget', value => obj5.value = value);
+   //g2.addWidget(obj5, 'trackpad', .5, .6, '#ff8080', 'my widget', value => obj5.value = value);
    g2.addWidget(obj5, 'textbox' , .5, .1, '#ffffff', 'hello', value => {});
 
    model.move(0,1.5,0).scale(.3).animate(() => {

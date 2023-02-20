@@ -330,7 +330,7 @@ function G2() {
             this.setColor(colors[n]);
          this.fillRect(x, y+u-uh/2, w * values[n], uh);
          if (labels)
-            this.fillText(labels[n], x-w/50, y+u, 'right', 0.5);
+            this.fillText(labels[n], x-w/60, 0.15 + y+0.2*n, 'right', 0);
       }
 
       this.setColor('black');

@@ -11,6 +11,11 @@ export const init = async model => {
 
    let ball = model.add('sphere');
 
+   let currOpacity = 1;
+   let prevNumber = 0;
+   let cube1 = model.add('cube').color(1,1,0);
+   let cube2 = cube1.add('cube').color(0,1,1).move(2.5,0,0);
+
    model.animate(() => {
 
       // SEE WHETHER LEFT CONTROLLER BEAM HITS THE BALL
