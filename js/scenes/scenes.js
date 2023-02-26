@@ -10,8 +10,11 @@ export default () => {
       enableSceneReloading: true,
       scenes: [
          { name: "HW3"               , path: "./HW3.js"       },
-         { name: "test"           , path: "./ctrlTest3.js"           },
-         { name: "DemoKP3"           , path: "./demoKP3.js"           }
+         { name: "test"           , path: "./demoCanvas.js"           },
+         { name: "DemoKP3"           , path: "./demoKP3.js"           },
+         { name: "HUD"           , path: "./demoHUD.js"},
+         { name: "twoCubes"      , path: "./demoTwoCubes.js"},
+         { name: "grab"          , path:"./demoKP2.js"}
       ]
    };
 }

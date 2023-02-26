@@ -14,21 +14,21 @@ let canCreate = false
 let sphereID = 0;
 
 let timeRemain = 4;
-
-let deleteCount = 0
-let timeRemaining = 4
+let showStat = false;
+let deleteCount = 0;
+let currLevel = 1;
 
 let getPosition = (obj, currTime) => {
     let currLocation = cg.add(obj.loc,cg.scale(obj.v, dt))
     obj.loc = currLocation
 
-    if (currLocation[0] > 3 || currLocation[0] < -2){
+    if ((currLocation[0] > 2 && obj.v[0] > 0)|| (currLocation[0] < -2 && obj.v[0] < 0)){
         obj.v[0] = -obj.v[0]
     }
-    if (currLocation[1] > 2.5 || currLocation[1] < 0){
+    if ((currLocation[1] > 2 && obj.v[1] > 0) || (currLocation[1] < -1 && obj.v[1] < 0)){
         obj.v[1] = -obj.v[1]
     }
-    if (currLocation[2] > 3 || currLocation[2] < -3){
+    if ((currLocation[2] > 3 && obj.v[2] > 0)|| (currLocation[2] < -3&& obj.v[2] < 0)){
         obj.v[2] = -obj.v[2]
     }
     return currLocation
@@ -91,13 +91,46 @@ let findIndex = (obj, currID) =>{
 }
 
 export const init = async model => {
+    //
+    // let gun = model.add('cube');
+    // let MP = cg.mTranslate(0,.5,.5);
 
-    let currOpacity = [1,1,1,1,1,1]
+    let isInBox = p => {
+      // FIRST TRANSFORM THE POINT BY THE INVERSE OF THE BOX'S MATRIX.
+      let q = cg.mTransform(cg.mInverse(gun.getMatrix()), p);
+      // THEN WE JUST NEED TO SEE IF THE RESULT IS INSIDE A UNIT CUBE.
+      return q[0] >= -1 & q[0] <= 1 &&
+             q[1] >= -1 & q[1] <= 1 &&
+             q[2] >= -1 & q[2] <= 1 ;
+   }
+
+    g2.textHeight(.1);
+    let backgroundWidget = model.add()
+
+    let createTable = () => {
+        let obj5 = backgroundWidget.add('cube')
+          .texture(() => {
+              g2.setColor('white');
+              g2.fillRect(0,0,1.5,1);
+              g2.setColor('black');
+              g2.textHeight(.05);
+              g2.fillText(currLevel.toString(), .8, .48, 'center');
+              g2.fillText('Current Level: ', .3, .48, 'center')
+              g2.fillText(deleteCount.toString(), .8, .28, 'center');
+              g2.fillText('No. of atoms destroyed', .3, .28, 'center');
+              g2.fillText('Scoring board', .5, .93, 'center');
+              g2.drawWidgets(obj5);
+      });
+      obj5.value = [.8,.8];
+      g2.addWidget(obj5, 'textbox' , .5, .1, '#ffffff', 'Welcome to VR!', value => {});
+      g2.addWidget(obj5, 'button', .7, .68, '#8080ff', 'LV3', value => {currLevel = 3});
+      g2.addWidget(obj5, 'button', .5, .68, '#ff8080', 'LV2', value => {currLevel = 2});
+      g2.addWidget(obj5, 'button', .3, .68, '#80ffff', 'LV1', value => {currLevel = 1});
+    }
 
     let prevNumber = 0;
 
-    let newSphere = model.add();
-    //let sphereChild = [];
+    let newSphere = model.add().scale(0.3);
     createSphere(newSphere)
 
     // ANIMATED BAR CHART
@@ -105,31 +138,38 @@ export const init = async model => {
         g2.setColor('black');
         g2.textHeight(.1);
         g2.fillText('Count Box', .5, .9, 'center');
-
         g2.setColor('blue');
         let values = [];
         values.push(deleteCount/8);
         values.push(timeRemain/5);
-        g2.barChart(.4,.3,.5,.5, values, ['remove','time'],
+        g2.barChart(.4,.3,.5,.5, values, ['score','time'],
             ['red','green']);
         g2.drawWidgets(obj3)
     });
     g2.addWidget(obj3, 'textbox' , .5, .2, '#ff8080', 'hello', value => {});
 
-    //let ball = model.add('sphere');
-
-
-    model.move(0,1.5,0).scale(.3).animate(() => {
+    model.move(0,1.5,0).animate(() => {
+        model.setTable(false);
         if ((buttonState.right[0].pressed && canCreate) || (timeRemain == 8 && newSphere._children.length < 2)){
             createSphere(newSphere)
             canCreate = false
+        }
+
+        if (buttonState.right[1].pressed){
+            if (backgroundWidget._children.length == 0){
+                createTable();
+            }
+            backgroundWidget.hud().scale(1,1,.0001).move(0,-3.5,2);
+        }
+        else{
+            backgroundWidget._children = [];
         }
 
         let new_time = Date.now() / 1000
         dt = new_time - t;
         currTime = currTime + dt
         t = new_time;
-        obj3.identity().move(0,2,-3).scale(.7,.7,.0001);
+        obj3.identity().move(0,0,-3).scale(.4,.4,.0001);
         if (deleteCount > 3){
             timeRemain = timeRemain - dt
             if (timeRemain <= 0){
@@ -176,6 +216,20 @@ export const init = async model => {
                 canCreate = true
             }
         }
+
+        // let ml = controllerMatrix.left;
+        // let mr = controllerMatrix.right;
+        //
+        // // EXTRACT THE LOCATION OF EACH CONTROLLER FROM ITS MATRIX,
+        // // AND USE IT TO SEE WHETHER THAT CONTROLLER IS INSIDE THE BOX.
+        //
+        // let isLeftInBox  = isInBox(ml.slice(12,15));
+        // if (! isLeftInBox){
+        //     gun.color(1,1,1);
+        //     MP = cg.mTranslate(0,-.5,.5);
+        //
+        //     gun.hud().setMatrix(MP).turnX(-0.6).scale(.06,0.15,0.06);
+        // }
 
     });
 }
